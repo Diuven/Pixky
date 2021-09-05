@@ -42,7 +42,7 @@ namespace Editor
             {
                 using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
                 {
-                    string line;
+                       string line;
                     while ((line = streamReader.ReadLine()) != null)
                     {
                         try
@@ -52,25 +52,16 @@ namespace Editor
                             
                             var name = line.Substring(4, 10).Trim();
                             if (name.Length == 0) name = "Unnamed";
-                            var rah = int.Parse(line.Substring(75, 2));
-                            var ram = int.Parse(line.Substring(77, 2));
-                            var ras = float.Parse(line.Substring(79, 4));
 
-                            var de = line[83] == '-' ? -1 : 1;
-                            var ded = int.Parse(line.Substring(84, 2));
-                            var dem = int.Parse(line.Substring(86, 2));
-                            var des = int.Parse(line.Substring(88, 2));
-
-                            Debug.Log($"{name} {rah}, {ram}, {ras}, {de}, {ded}, {dem}, {des}, {mag}");
+                            var vec = EquatorialVector.Parse(line.Substring(75, EquatorialVector.ParseLength));
+                            Debug.Log($"{name} {vec.Ra}, {vec.Dec}, {mag}");
                             
-                            var ra = (rah + ram / 60f + ras / 3600f) * 360 / 24f;
-                            var dec = de * (ded + dem / 60f + des / 3600f);
-                            var star = new Star(ra, dec, mag, name);
+                            var star = new Star(vec, mag, name);
                             stars.Add(star);
                         }
-                        catch
+                        catch (Exception e)
                         {
-                            Debug.Log("Skipped");
+                            Debug.Log($"Skipped due to {e}");
                         }
                     }
                 }
